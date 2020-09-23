@@ -1,135 +1,299 @@
 <template>
-  <div id="app">
-<!-- ========= App bar =========== -->
-
-      <v-app-bar app>
-
-        <v-app id="inspire">
-
+    <v-app>
+        <v-app-bar app>
             <v-autocomplete
-                    v-model="select"
-                    :loading="loading"
-                    :items="items"
-                    :search-input.sync="search"
-                    cache-items
-                    class="mx-4"
-                    flat
-                    hide-no-data
-                    hide-details
-                    label="Word in the title of films"
-                    solo-inverted
+                class="ml-2"
+                v-model="searchedMovie"
+                :loading="isLoading"
+                :items="moviesList"
+                :search-input.sync="search"
+                item-text="Title"
+                item-value="Title"
+                placeholder="Enter movie name"
+                prepend-inner-icon="mdi-magnify"
+                clearable
+                solo-inverted
+                flat
+                hide-details
+                return-object
             ></v-autocomplete>
-        </v-app>
-      </v-app-bar>
+        </v-app-bar>
 
-<!-- ========= Cards ============= -->
-    <div>
-      <v-card
-              class="mx-auto"
-      >
+        <v-main>
+            <v-sheet class="d-flex flex-wrap ma-4">
+                <v-card
+                    v-for="movie in moviesList"
+                    :key="movie.imdbID"
+                    class="ma-2 flex-grow-1"
+                    :href="`https://www.imdb.com/title/${movie.imdbID}`"
+                    max-width="500"
+                >
+                    <v-img
+                        :src="movie.Poster"
+                        height="400px"
+                    ></v-img>
 
-          <v-row dense>
-            <v-col v-for="(course, index) in courses" :key="index"
-                   :cols="12" cm="6" md="4" lg="3" xl="3">
-              <v-card >
-                <a v-bind:href="otherSite(course.imdbID)">
-                  <img :src="course.Poster" class="imgInCard">
-                  <div class="textInCard">
-                    <p class="titleInCard"> {{course.Title}} </p>
-                    <p>Year: {{course.Year}}</p>
-                    <p>ID: {{course.imdbID}}</p>
-                  </div>
-                </a>
-              </v-card>
-            </v-col>
-          </v-row>
+                    <v-card-title>
+                        {{movie.Title}}
+                    </v-card-title>
 
-      </v-card>
-    </div>
-  </div>
+                    <v-card-subtitle>
+                        Year: {{movie.Year}}
+                    </v-card-subtitle>
+
+                    <v-card-text>
+                        ImdbID: {{movie.imdbID}}
+                    </v-card-text>
+                </v-card>
+            </v-sheet>
+        </v-main>
+    </v-app>
 </template>
 
 <script>
-    import Vuetify from 'vuetify';
-    import axios from 'axios';
+    import _ from 'lodash';
 
     export default {
-        vuetify: new Vuetify(),
         name: 'App',
-
-        data() {
-            return {
-                courses: null,
-                loading: false,
-                items: [],
-                search: null,
-                select: null,
-                states: [
-                    'word', 'letter', 'number', 'person', 'pen', 'class', 'people', 'sound', 'water', 'side', 'place', 'man', 'woman', 'boy', 'Hawaii', 'girl', 'year', 'day', 'week', 'month', 'name', 'line', 'air', 'land', 'home', 'hand', 'house', 'picture', 'Mississippi', 'animal', 'mother', 'father', 'brother', 'sister', 'new', 'world', 'New York', 'head', 'north', 'page', 'country', 'question', 'answer', 'school', 'plant', 'Puerto Rico', 'sun', 'state', 'city', 'Tennessee', 'Texas', 'south', 'east', 'child', 'west', 'Washington', 'vacation', 'Wisconsin', 'Wyoming', 'valley',
-                ],
-            }
+        components: {
         },
-        watch: {
-            search(val) {
-                val && val !== this.select && this.querySelections(val)
-                if (val == this.select) {
-                    axios
-                        .get('http://www.omdbapi.com/?apikey=e9a2816f&' + 's=' + val)
-                        .then(response => this.courses = response.data.Search)
+        data: () => ({
+            isLoading: false,
+            moviesList: [
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg",
+                    Title: "The Shawshank Redemption",
+                    Type: "movie",
+                    Year: "1994",
+                    imdbID: "tt0111161"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg",
+                    Title: "The Godfather",
+                    Type: "movie",
+                    Year: "1972",
+                    imdbID: "tt0068646",
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_SX300.jpg",
+                    Title: "The Dark Knight",
+                    Type: "movie",
+                    Year: "2008",
+                    imdbID: "tt0468569"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMWMwMGQzZTItY2JlNC00OWZiLWIyMDctNDk2ZDQ2YjRjMWQ0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg",
+                    Title: "The Godfather: Part II",
+                    Type: "movie",
+                    Year: "1974",
+                    imdbID: "tt0071562"
+
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg",
+                    Title: "The Lord of the Rings: The Return of the King",
+                    Type: "movie",
+                    Year: "2003",
+                    imdbID: "tt0167260"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg",
+                    Title: "Pulp Fiction",
+                    Type: "movie",
+                    Year: "1994",
+                    imdbID: "tt0110912"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BNDE4OTMxMTctNmRhYy00NWE2LTg3YzItYTk3M2UwOTU5Njg4XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
+                    Title: "Schindler's List",
+                    Type: "movie",
+                    Year: "1993",
+                    imdbID: "tt0108052"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BZDc5YjRlMzctODMxYS00MDA4LWFhNjktMjhlODBkZTE0ZDQwXkEyXkFqcGdeQXVyMjQ2MTk1OTE@._V1_SX300.jpg",
+                    Title: "An American Crime",
+                    Type: "movie",
+                    Year: "2007",
+                    imdbID: "tt0802948"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTQxMTAzNDA4NV5BMl5BanBnXkFtZTcwOTQ2MTU0MQ@@._V1_SX300.jpg",
+                    Title: "Elsa & Fred",
+                    Type: "movie",
+                    Year: "2005",
+                    imdbID: "tt0453047",
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMWU4N2FjNzYtNTVkNC00NzQ0LTg0MjAtYTJlMjFhNGUxZDFmXkEyXkFqcGdeQXVyNjc1NTYyMjg@._V1_SX300.jpg",
+                    Title: "12 Angry Men",
+                    Type: "movie",
+                    Year: "1957",
+                    imdbID: "tt0050083"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BNmI0MTliMTAtMmJhNC00NTJmLTllMzQtMDI3NzA1ODMyZWI1XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_SX300.jpg",
+                    Title: "Dil Bechara",
+                    Type: "movie",
+                    Year: "2020",
+                    imdbID: "tt8110330"
+                },
+                {
+                    Title: "The Perks of Being a Wallflower",
+                    Year: "2012",
+                    imdbID: "tt1659337",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BZThjMmQ5Yj…2VhNzQ0XkEyXkFqcGdeQXVyMTAyNjg4NjE0._V1_SX300.jpg"
+                },
+                {
+                    Title: "Once Upon a Time in the West",
+                    Year: "1968",
+                    imdbID: "tt0064116",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BZGI5MjBmYz…2U3MDdiXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg"
+                },
+                {
+                    Title: "The A-Team",
+                    Year: "2010",
+                    imdbID: "tt0429493",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTc4ODc4NTQ1N15BMl5BanBnXkFtZTcwNDUxODUyMw@@._V1_SX300.jpg"
+                },
+                {
+                    Title: "Perfume: The Story of a Murderer",
+                    Year: "2006",
+                    imdbID: "tt0396171",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMjEyYjVkM2…2FjOGUxXkEyXkFqcGdeQXVyMTIxODU0NzI5._V1_SX300.jpg"
+                },
+                {
+                    Title: "A Million Ways to Die in the West",
+                    Year: "2014",
+                    imdbID: "tt2557490",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTQ0NDcyNjg0MV5BMl5BanBnXkFtZTgwMzk4NTA4MTE@._V1_SX300.jpg"
+                },
+                {
+                    Title: "Valerian and the City of a Thousand Planets",
+                    Year: "2017",
+                    imdbID: "tt2239822",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTkxMDAxNDUyNV5BMl5BanBnXkFtZTgwOTc3MzcxMjI@._V1_SX300.jpg"
+                },
+                {
+                    Title: "The Killing of a Sacred Deer",
+                    Year: "2017",
+                    imdbID: "tt5715874",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMjU4NDcwOTA2NF5BMl5BanBnXkFtZTgwMjE2OTg4MzI@._V1_SX300.jpg"
+                },
+                {
+                    Title: "A Walk Among the Tombstones",
+                    Year: "2014",
+                    imdbID: "tt0365907",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTQ3NzY2MTg1M15BMl5BanBnXkFtZTgwODY2Njk4MTE@._V1_SX300.jpg"
+                },
+                {
+                    Title: "Seeking a Friend for the End of the World",
+                    Year: "2012",
+                    imdbID: "tt1307068",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTk4MDQ1NzE3N15BMl5BanBnXkFtZTcwMjA0MDkzNw@@._V1_SX300.jpg"
+                },
+                {
+                    Title: "A Night at the Roxbury",
+                    Year: "1998",
+                    imdbID: "tt0120770",
+                    Type: "movie",
+                    Poster: "https://m.media-amazon.com/images/M/MV5BYTczZmEyYW…2ltYWdlXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTAwNTIzNDk1MDVeQTJeQWpwZ15BbWU3MDMwNzAwMDE@._V1_SX300.jpg",
+                    Title: "American Wedding",
+                    Type: "movie",
+                    Year: "2003",
+                    imdbID: "tt0328828"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTY4MTEyMzU1N15BMl5BanBnXkFtZTcwNDQ0NTc1Nw@@._V1_SX300.jpg",
+                    Title: "American Reunion",
+                    Type: "movie",
+                    Year: "2012",
+                    imdbID: "tt1605630"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BOTEyYjhiMjYtNjU3YS00NmQ4LTlhNTEtYTczNWY3MGJmNzE2XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
+                    Title: "American Pie 2",
+                    Type: "movie",
+                    Year: "2001",
+                    imdbID: "tt0252866"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTg3ODY5ODI1NF5BMl5BanBnXkFtZTgwMTkxNTYxMTE@._V1_SX300.jpg",
+                    Title: "American Pie",
+                    Type: "movie",
+                    Year: "1999",
+                    imdbID: "tt0163651"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMjFmZGI2YTEtYmJhMS00YTE5LWJjNjAtNDI5OGY5ZDhmNTRlXkEyXkFqcGdeQXVyODAwMTU1MTE@._V1_SX300.jpg",
+                    Title: "American Gangster",
+                    Type: "movie",
+                    Year: "2007",
+                    imdbID: "tt0765429"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMTkxNzI3ODI4Nl5BMl5BanBnXkFtZTgwMjkwMjY4MjE@._V1_SX300.jpg",
+                    Title: "American Sniper",
+                    Type: "movie",
+                    Year: "2014",
+                    imdbID: "tt2179136"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BMmM4YzJjZGMtNjQxMy00NjdlLWJjYTItZWZkYzdhOTdhNzFiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg",
+                    Title: "American Hustle",
+                    Type: "movie",
+                    Year: "2013",
+                    imdbID: "tt1800241"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BZTM2ZGJmNjQtN2UyOS00NjcxLWFjMDktMDE2NzMyNTZlZTBiXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SX300.jpg",
+                    Title: "American Psycho",
+                    Type: "movie",
+                    Year: "2000",
+                    imdbID: "tt0144084"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BZjA0MTM4MTQtNzY5MC00NzY3LWI1ZTgtYzcxMjkyMzU4MDZiXkEyXkFqcGdeQXVyNDYyMDk5MTU@._V1_SX300.jpg",
+                    Title: "American History X",
+                    Type: "movie",
+                    Year: "1998",
+                    imdbID: "tt0120586"
+                },
+                {
+                    Poster: "https://m.media-amazon.com/images/M/MV5BNTBmZWJkNjctNDhiNC00MGE2LWEwOTctZTk5OGVhMWMyNmVhXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg",
+                    Title: "American Beauty",
+                    Type: "movie",
+                    Year: "1999",
+                    imdbID: "tt0169547"
                 }
-            },
-        },
-        methods: {
-            querySelections(v) {
-                this.loading = true
-                // Simulated ajax query
-                setTimeout(() => {
-                    this.items = this.states.filter(e => {
-                        return (e || '').toLowerCase().indexOf((v || '').toLowerCase()) > -1
-                    })
-                    this.loading = false
-                }, 500)
-            },
-            otherSite(id) {
-               return 'https://www.imdb.com/title/' + id + '/';
-            }
-        },
-        mounted() {
-            axios
-                .get('http://www.omdbapi.com/?apikey=e9a2816f&s="Love"')
-                .then(response => this.courses = response.data.Search)
+            ],
+            searchedMovie: '',
+            search: ''
+        }),
+        watch: {
+            search: _.debounce(function(movieName){
+                if (this.isLoading || !movieName) return
+
+                this.isLoading = true
+
+                fetch(`https://www.omdbapi.com/?s=${movieName}&type=movie&r=json&apikey=fabd0e57`)
+                .then(res => res.json())
+                .then(res => { this.moviesList = res.Search; })
+                .catch(err => { console.log(err); })
+                .finally(() => { this.isLoading = false; });
+            }, 300)
         }
-    }
-
+    };
 </script>
-
-<style>
-  .v-application--wrap {
-    min-height: 5vh !important;
-  }
-  .v-toolbar__content, .v-toolbar__extension {
-    display: block !important;
-  }
-
-  .titleInCard {
-    height: 50px;
-    font-weight: bolder;
-    font-size: large;
-  }
-
-  .textInCard {
-    padding: 10px;
-  }
-
-  .imgInCard {
-    width: 100%;
-    height: 60vh;
-  }
-
-  a {
-    text-decoration: none;
-    color: black;
-  }
-
-
-</style>
